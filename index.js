@@ -1,0 +1,117 @@
+const FLOOR_HEIGHT = 100;
+
+var canvas = document.getElementById("myCanvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+var ctx = canvas.getContext("2d");
+
+const player = {
+    x: canvas.width/2,
+    y: canvas.height/2,
+    dx: 0,
+    dy: 0,
+    speed: 5,
+    size: 10
+}
+
+var keys = {
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+
+    space: false,
+
+    e: false,
+    q: false
+}
+
+function doKeyActions() {
+    if (keys.w) { player.y -= player.speed; }
+    if (keys.a) { player.x -= player.speed; }
+    if (keys.s) { player.y += player.speed; }
+    if (keys.d) { player.x += player.speed; }
+}
+
+function handleKeyDownEvent(e) {
+    const key = convertKey(e);
+    
+    keys[key] = true;
+    console.log(keys);
+}
+
+function handleKeyUpEvent(e) {
+    const key = convertKey(e);
+    
+    keys[key] = false;
+    console.log(keys);
+}
+
+function convertKey(e) {
+    const key = String(e.key).toLowerCase();
+
+    switch(key) {
+        case " ":
+            return "space";
+        default:
+            return key;
+    }
+
+}
+
+function drawPlayer() {
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.size, 0, Math.PI*2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawScores() {
+    ctx.font = "80px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(leftScore, (canvas.width / 2) - 80, 80);
+    ctx.fillText(rightScore, (canvas.width / 2) + 40, 80);
+}
+
+function checkCollisionsWithWalls() {
+    var xMin = player.size;
+    var xMax = canvas.width - player.size;
+    var yMin = player.size;
+    var yMax = canvas.height - player.size;
+
+    if (player.x < xMin) {
+        player.x = xMin;
+    } else if (player.x > xMax) {
+        player.x = xMax;
+    } 
+    
+    if (player.y < yMin) {
+        player.y = yMin;
+    } else if (player.y > yMax) {
+        player.y = yMax;
+    }
+}
+
+function drawScene() {
+    ctx.beginPath();
+    // ctx.rect(0, canvas.height - FLOOR_HEIGHT, canvas.width, 2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.closePath();
+}
+
+function draw() {
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // drawScene();
+    doKeyActions();
+    checkCollisionsWithWalls();
+    drawPlayer();
+    player.x += player.dx;
+    player.y += player.dy;
+}
+
+setInterval(draw, 10);
+document.addEventListener("keydown", handleKeyDownEvent, false);
+document.addEventListener("keyup", handleKeyUpEvent, false);
